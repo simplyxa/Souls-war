@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-souls}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-souls}
+      POSTGRES_DB: ${POSTGRES_DB:-souls}
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-souls} -d ${POSTGRES_DB:-souls}']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  server:
+    build: ./server
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-souls}:${POSTGRES_PASSWORD:-souls}@db:5432/${POSTGRES_DB:-souls}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+      PORT: 3000
+      SEED_DEMO: ${SEED_DEMO:-true}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+
+  client:
+    build: ./client
+    depends_on:
+      - server
+    ports:
+      - '8080:80'
+
+volumes:
+  dbdata:

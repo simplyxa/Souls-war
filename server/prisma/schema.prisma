@@ -1,0 +1,213 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PLAYER
+  ADMIN
+}
+
+enum NpcType {
+  MONSTER
+  FRIENDLY
+  MERCHANT
+}
+
+enum ItemType {
+  CONSUMABLE
+  WEAPON
+  ARMOR
+}
+
+enum QuestStatus {
+  ACTIVE
+  COMPLETED
+}
+
+enum CombatStatus {
+  ACTIVE
+  WON
+  LOST
+  FLED
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String
+  role         Role     @default(PLAYER)
+  createdAt    DateTime @default(now())
+  player       Player?
+}
+
+model Location {
+  id          Int            @id @default(autoincrement())
+  name        String         @unique
+  description String
+  hasInn      Boolean        @default(false)
+  npcs        Npc[]
+  exits       LocationLink[] @relation("LinkFrom")
+  entrances   LocationLink[] @relation("LinkTo")
+  players     Player[]
+  quests      Quest[]
+}
+
+model LocationLink {
+  id       Int      @id @default(autoincrement())
+  fromId   Int
+  toId     Int
+  minLevel Int      @default(1)
+  from     Location @relation("LinkFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to       Location @relation("LinkTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId])
+}
+
+model Item {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  description   String          @default("")
+  type          ItemType
+  price         Int             @default(0)
+  damage        Int             @default(0)
+  armor         Int             @default(0)
+  bonusStr      Int             @default(0)
+  bonusDex      Int             @default(0)
+  bonusInt      Int             @default(0)
+  healHp        Int             @default(0)
+  restoreEnergy Int             @default(0)
+  inventory     InventoryItem[]
+  shopEntries   ShopEntry[]
+  npcDrops      Npc[]           @relation("NpcDrop")
+  questRewards  Quest[]         @relation("QuestReward")
+}
+
+model Npc {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  description String      @default("")
+  type        NpcType
+  locationId  Int
+  level       Int         @default(1)
+  maxHp       Int         @default(20)
+  attack      Int         @default(3)
+  defense     Int         @default(0)
+  agility     Int         @default(1)
+  expReward   Int         @default(10)
+  goldReward  Int         @default(5)
+  dropItemId  Int?
+  dropChance  Float       @default(0)
+  location    Location    @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  dropItem    Item?       @relation("NpcDrop", fields: [dropItemId], references: [id], onDelete: SetNull)
+  shop        ShopEntry[]
+  quests      Quest[]
+  combats     Combat[]
+}
+
+model ShopEntry {
+  id     Int  @id @default(autoincrement())
+  npcId  Int
+  itemId Int
+  npc    Npc  @relation(fields: [npcId], references: [id], onDelete: Cascade)
+  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([npcId, itemId])
+}
+
+model Player {
+  id           Int             @id @default(autoincrement())
+  userId       Int             @unique
+  name         String          @unique
+  level        Int             @default(1)
+  exp          Int             @default(0)
+  hp           Int             @default(40)
+  maxHp        Int             @default(40)
+  energy       Int             @default(20)
+  maxEnergy    Int             @default(20)
+  energyAt     DateTime        @default(now())
+  gold         Int             @default(50)
+  strength     Int             @default(5)
+  dexterity    Int             @default(5)
+  intelligence Int             @default(5)
+  locationId   Int
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location     Location        @relation(fields: [locationId], references: [id])
+  inventory    InventoryItem[]
+  quests       PlayerQuest[]
+  combats      Combat[]
+  logs         ActionLog[]
+}
+
+model InventoryItem {
+  id       Int     @id @default(autoincrement())
+  playerId Int
+  itemId   Int
+  quantity Int     @default(1)
+  equipped Boolean @default(false)
+  player   Player  @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  item     Item    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, itemId])
+}
+
+model Quest {
+  id              Int           @id @default(autoincrement())
+  title           String        @unique
+  description     String
+  minLevel        Int           @default(1)
+  giverLocationId Int?
+  targetNpcId     Int
+  targetCount     Int           @default(1)
+  rewardExp       Int           @default(0)
+  rewardGold      Int           @default(0)
+  rewardItemId    Int?
+  prerequisiteId  Int?
+  giverLocation   Location?     @relation(fields: [giverLocationId], references: [id], onDelete: SetNull)
+  targetNpc       Npc           @relation(fields: [targetNpcId], references: [id], onDelete: Cascade)
+  rewardItem      Item?         @relation("QuestReward", fields: [rewardItemId], references: [id], onDelete: SetNull)
+  prerequisite    Quest?        @relation("QuestChain", fields: [prerequisiteId], references: [id], onDelete: SetNull)
+  followUps       Quest[]       @relation("QuestChain")
+  players         PlayerQuest[]
+}
+
+model PlayerQuest {
+  id       Int         @id @default(autoincrement())
+  playerId Int
+  questId  Int
+  status   QuestStatus @default(ACTIVE)
+  progress Int         @default(0)
+  player   Player      @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  quest    Quest       @relation(fields: [questId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, questId])
+}
+
+model Combat {
+  id        Int          @id @default(autoincrement())
+  playerId  Int
+  npcId     Int
+  npcHp     Int
+  round     Int          @default(1)
+  status    CombatStatus @default(ACTIVE)
+  createdAt DateTime     @default(now())
+  player    Player       @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  npc       Npc          @relation(fields: [npcId], references: [id], onDelete: Cascade)
+
+  @@index([playerId, status])
+}
+
+model ActionLog {
+  id        Int      @id @default(autoincrement())
+  playerId  Int
+  message   String
+  createdAt DateTime @default(now())
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@index([playerId, id])
+}
