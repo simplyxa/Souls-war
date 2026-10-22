@@ -1,0 +1,171 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  background: #1b1713;
+  color: #e8dcc4;
+}
+h1,
+h2,
+h3 {
+  margin: 0.3em 0;
+}
+h2 {
+  font-size: 1.15rem;
+  border-bottom: 1px solid #5a4a33;
+  padding-bottom: 4px;
+}
+h3 {
+  font-size: 1rem;
+  color: #d9b36b;
+}
+.muted {
+  color: #9a8c73;
+  font-size: 0.9em;
+}
+.center {
+  text-align: center;
+  padding: 3rem;
+}
+.game {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 12px;
+}
+.panel {
+  background: #2a231b;
+  border: 1px solid #5a4a33;
+  border-radius: 6px;
+  padding: 12px;
+}
+.panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.panel li {
+  padding: 6px 0;
+  border-bottom: 1px dotted #4a3d2b;
+}
+.log {
+  grid-column: 1 / -1;
+  max-height: 320px;
+  overflow-y: auto;
+}
+button {
+  background: #6b4e1f;
+  color: #fff4d6;
+  border: 1px solid #8f6b2c;
+  border-radius: 4px;
+  padding: 4px 10px;
+  margin: 2px 6px 2px 0;
+  cursor: pointer;
+  font: inherit;
+}
+button:hover:not(:disabled) {
+  background: #8f6b2c;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+button.link {
+  background: none;
+  border: none;
+  color: #d9b36b;
+  text-decoration: underline;
+}
+input {
+  width: 100%;
+  padding: 6px;
+  margin-top: 4px;
+  background: #1b1713;
+  color: inherit;
+  border: 1px solid #5a4a33;
+  border-radius: 4px;
+}
+label {
+  display: block;
+  margin: 10px 0;
+}
+.error {
+  background: #5a1d1d;
+  border: 1px solid #a33;
+  padding: 8px;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+.auth {
+  display: flex;
+  justify-content: center;
+  padding-top: 10vh;
+}
+.auth .panel {
+  width: 360px;
+}
+.bar-row {
+  margin: 6px 0;
+  font-size: 0.9em;
+}
+.bar {
+  height: 10px;
+  background: #1b1713;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  transition: width 0.3s;
+}
+.fill.hp {
+  background: #b03a3a;
+}
+.fill.energy {
+  background: #3a7ab0;
+}
+.fill.enemy {
+  background: #8a3ab0;
+}
+.stats li {
+  border: none !important;
+  padding: 2px 0 !important;
+}
+.buttons {
+  margin: 6px 0;
+}
+.combat {
+  border: 1px solid #a33;
+  border-radius: 6px;
+  padding: 8px;
+  background: #3a1f1a;
+}
+.result.won {
+  color: #7ec27e;
+}
+.result.lost {
+  color: #e07070;
+}
+.tag {
+  font-size: 0.75em;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: #4a3d2b;
+}
+.tag.active {
+  background: #3a5a7a;
+}
+.tag.completed {
+  background: #3a6a3a;
+}
