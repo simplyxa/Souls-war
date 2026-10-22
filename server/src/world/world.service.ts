@@ -83,15 +83,16 @@ export class WorldService {
       const location = await tx.location.findUnique({ where: { id: player.locationId } });
       if (!location?.hasInn) throw new BadRequestException('There is no inn in this location');
       if (player.gold < INN_PRICE) throw new BadRequestException('Not enough gold');
-      await tx.player.update({
-        where: { id: player.id },
+      const paid = await tx.player.updateMany({
+        where: { id: player.id, gold: { gte: INN_PRICE } },
         data: {
-          gold: player.gold - INN_PRICE,
+          gold: { decrement: INN_PRICE },
           hp: player.maxHp,
           energy: player.maxEnergy,
           energyAt: new Date(),
         },
       });
+      if (paid.count === 0) throw new BadRequestException('Not enough gold');
       await this.logs.add(
         tx,
         player.id,

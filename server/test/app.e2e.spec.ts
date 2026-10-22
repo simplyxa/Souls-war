@@ -9,7 +9,6 @@ import { configureApp } from '../src/setup';
  *   DATABASE_URL=... E2E=1 npx jest test
  */
 const run = process.env.E2E ? describe : describe.skip;
-const SCHEME = 'Bear' + 'er ';
 
 run('game flow (e2e)', () => {
   let app: INestApplication;
@@ -30,7 +29,7 @@ run('game flow (e2e)', () => {
       .post('/api/auth/login')
       .send({ username: u, password: p })
       .expect(200);
-    return ['Authorization', SCHEME + res.body.accessToken];
+    return ['Authorization', `Bearer ${res.body.accessToken}`];
   };
   const get = (url: string, a = auth) =>
     request(server())

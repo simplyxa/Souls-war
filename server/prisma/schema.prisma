@@ -84,6 +84,8 @@ model Item {
   restoreEnergy Int             @default(0)
   inventory     InventoryItem[]
   shopEntries   ShopEntry[]
+  npcDrops      Npc[]           @relation("NpcDrop")
+  questRewards  Quest[]         @relation("QuestReward")
 }
 
 model Npc {
@@ -102,6 +104,7 @@ model Npc {
   dropItemId  Int?
   dropChance  Float       @default(0)
   location    Location    @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  dropItem    Item?       @relation("NpcDrop", fields: [dropItemId], references: [id], onDelete: SetNull)
   shop        ShopEntry[]
   quests      Quest[]
   combats     Combat[]
@@ -167,6 +170,9 @@ model Quest {
   prerequisiteId  Int?
   giverLocation   Location?     @relation(fields: [giverLocationId], references: [id], onDelete: SetNull)
   targetNpc       Npc           @relation(fields: [targetNpcId], references: [id], onDelete: Cascade)
+  rewardItem      Item?         @relation("QuestReward", fields: [rewardItemId], references: [id], onDelete: SetNull)
+  prerequisite    Quest?        @relation("QuestChain", fields: [prerequisiteId], references: [id], onDelete: SetNull)
+  followUps       Quest[]       @relation("QuestChain")
   players         PlayerQuest[]
 }
 

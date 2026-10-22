@@ -210,7 +210,7 @@ export class CombatService {
       where: { id: player.id },
       data: {
         hp: Math.max(1, Math.floor(player.maxHp / 2)),
-        gold: player.gold - loss,
+        gold: { decrement: loss },
         ...(start ? { locationId: start.id } : {}),
       },
     });

@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { jwtSecret } from './jwt-secret';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({
@@ -12,7 +13,7 @@ import { JwtStrategy } from './jwt.strategy';
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET', 'dev-secret-change-me'),
+        secret: jwtSecret(config),
         signOptions: { expiresIn: config.get<string>('JWT_EXPIRES_IN', '1d') },
       }),
     }),

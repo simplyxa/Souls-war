@@ -223,6 +223,9 @@ ALTER TABLE "LocationLink" ADD CONSTRAINT "LocationLink_toId_fkey" FOREIGN KEY (
 ALTER TABLE "Npc" ADD CONSTRAINT "Npc_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Npc" ADD CONSTRAINT "Npc_dropItemId_fkey" FOREIGN KEY ("dropItemId") REFERENCES "Item"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "ShopEntry" ADD CONSTRAINT "ShopEntry_npcId_fkey" FOREIGN KEY ("npcId") REFERENCES "Npc"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -245,6 +248,12 @@ ALTER TABLE "Quest" ADD CONSTRAINT "Quest_giverLocationId_fkey" FOREIGN KEY ("gi
 
 -- AddForeignKey
 ALTER TABLE "Quest" ADD CONSTRAINT "Quest_targetNpcId_fkey" FOREIGN KEY ("targetNpcId") REFERENCES "Npc"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Quest" ADD CONSTRAINT "Quest_rewardItemId_fkey" FOREIGN KEY ("rewardItemId") REFERENCES "Item"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Quest" ADD CONSTRAINT "Quest_prerequisiteId_fkey" FOREIGN KEY ("prerequisiteId") REFERENCES "Quest"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PlayerQuest" ADD CONSTRAINT "PlayerQuest_playerId_fkey" FOREIGN KEY ("playerId") REFERENCES "Player"("id") ON DELETE CASCADE ON UPDATE CASCADE;

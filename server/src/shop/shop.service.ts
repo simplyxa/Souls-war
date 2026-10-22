@@ -55,7 +55,11 @@ export class ShopService {
       if (!entry) throw new BadRequestException('No merchant here sells this item');
       const total = entry.item.price * quantity;
       if (player.gold < total) throw new BadRequestException(`Not enough gold (need ${total})`);
-      await tx.player.update({ where: { id: player.id }, data: { gold: { decrement: total } } });
+      const paid = await tx.player.updateMany({
+        where: { id: player.id, gold: { gte: total } },
+        data: { gold: { decrement: total } },
+      });
+      if (paid.count === 0) throw new BadRequestException(`Not enough gold (need ${total})`);
       await this.inventory.grant(tx, player.id, itemId, quantity);
       await this.logs.add(
         tx,

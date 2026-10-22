@@ -441,7 +441,8 @@ async function main() {
       gold: 250,
     },
   ];
-  for (const a of accounts) {
+  const seedDemo = process.env.SEED_DEMO !== 'false';
+  for (const a of seedDemo ? accounts : []) {
     if (await prisma.user.findUnique({ where: { username: a.username } })) continue;
     const bonus = a.level - 1;
     const user = await prisma.user.create({

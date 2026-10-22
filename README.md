@@ -46,8 +46,9 @@ Docker (файл `.env` рядом с `docker-compose.yml`, см. `.env.example`
 | `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | `souls`          | Доступ к БД                       |
 | `JWT_SECRET`                                | `change-me-in-production`  | Секрет подписи JWT (**смените!**) |
 | `JWT_EXPIRES_IN`                            | `1d`                       | Время жизни токена                |
+| `SEED_DEMO`                                 | `true`                     | `false` — не создавать демо-аккаунты (в т.ч. `admin/admin123`) |
 
-Сервер (`server/.env.example`): `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `PORT` (3000), `CORS_ORIGIN` (список через запятую, по умолчанию — любой).
+Сервер (`server/.env.example`): `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `PORT` (3000), `CORS_ORIGIN` (список через запятую; по умолчанию CORS выключен — фронтенд ходит через тот же origin/прокси). В production без `JWT_SECRET` сервер не стартует.
 
 ## Локальная разработка без Docker
 
