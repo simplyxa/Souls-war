@@ -1,19 +1,15 @@
-services:
-  - type: pserv
-    name: souls-war-db
-    env: postgres
+databases:
+  - name: souls-war-db
     plan: free
-    region: oregon
-    postgresMajorVersion: 16
+    postgresMajorVersion: "16"
 
+services:
   - type: web
     name: souls-war-api
-    env: docker
+    runtime: docker
     plan: free
-    region: oregon
-    dockerContext: ./server
     dockerfilePath: ./server/Dockerfile
-    healthCheckPath: /api/health
+    dockerContext: ./server
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -24,21 +20,20 @@ services:
       - key: JWT_EXPIRES_IN
         value: 1d
       - key: PORT
-        value: 3000
-      - key: NODE_ENV
-        value: production
-      - key: CORS_ORIGIN
-        value: https://souls-war-web.onrender.com
+        value: "3000"
       - key: SEED_DEMO
         value: "true"
 
   - type: web
     name: souls-war-web
-    env: docker
-    plan: free
-    region: oregon
-    dockerContext: ./client
-    dockerfilePath: ./client/Dockerfile
-    envVars:
-      - key: API_ORIGIN
-        value: https://souls-war-api.onrender.com
+    runtime: static
+    rootDir: client
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://souls-war-api.onrender.com/api/*
+      - type: rewrite
+        source: /*
+        destination: /index.html
